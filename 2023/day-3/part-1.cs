@@ -1,77 +1,88 @@
 ﻿using System;
 using System.IO;
 
-string fileContentsString = "";
-string inputFile = @"./inputt.txt";
-
-if (File.Exists(inputFile))
-{
-    fileContentsString = readAndConvertFileContentsToString(inputFile);
-}
-else
+string inputFile = @"./input.txt";
+if (!File.Exists(inputFile))
 {
     Console.WriteLine($"Couldn't find file named: {inputFile.TrimStart("./".ToCharArray())}");
     return;
+
 }
 
-Console.WriteLine("hui");
-int[] indexesToExamine = { 1, 9, 10, 11 };
-string partNumber = "";
 int sum = 0;
-for (int i = 0; i < fileContentsString.Length; i++)
+string[] lines = File.ReadAllLines(inputFile);
+
+for (int i = 0; i < lines.Length; i++)
 {
-    if (Char.IsDigit(fileContentsString[i]))
+    string currentline = lines[i];
+    string prevLine = "";
+    string nextLine = "";
+
+    if (i - 1 >= 0)
     {
-        partNumber += fileContentsString[i];
+        prevLine = lines[i - 1];
+    }
+    if (i + 1 < lines.Length)
+    {
+        nextLine = lines[i + 1];
+    }
 
-        foreach (int index in indexesToExamine)
+    string partNumber = "";
+    bool isPartNumberValid = false;
+    for (int j = 0; j < currentline.Length; j++)
+    {
+        if (char.IsDigit(currentline[j]))
         {
-            if ((i + index) > fileContentsString.Length - 1)
+            partNumber += currentline[j];
+
+            if (isPartNumberValid)
             {
-                break;
+                continue;
             }
 
-            if (isSymbol(fileContentsString[i + index]))
-            {
-            }
+            char[] diagonalCharacters = new char[8];
 
+            diagonalCharacters[0] = currentline.ElementAtOrDefault(j - 1);
+            diagonalCharacters[1] = currentline.ElementAtOrDefault(j + 1);
+
+            diagonalCharacters[2] = prevLine.ElementAtOrDefault(j);
+            diagonalCharacters[3] = prevLine.ElementAtOrDefault(j - 1);
+            diagonalCharacters[4] = prevLine.ElementAtOrDefault(j + 1);
+
+            diagonalCharacters[5] = nextLine.ElementAtOrDefault(j);
+            diagonalCharacters[6] = nextLine.ElementAtOrDefault(j - 1);
+            diagonalCharacters[7] = nextLine.ElementAtOrDefault(j + 1);
+
+            for (int k = 0; k < 8; k++)
+            {
+                if (isSymbol(diagonalCharacters[k]))
+                {
+                    Console.WriteLine($"Part Number: {partNumber} and Symbol at {k}: {diagonalCharacters[k]} \nPrevLine: {prevLine} \nNextLine: {nextLine}\n");
+                    isPartNumberValid = true;
+                    break;
+                }
+            }
         }
-    }
-    else if (isSymbol(fileContentsString[i]))
-    {
-        continue;
-    }
-    else if (fileContentsString[i] == '.')
-    {
-        partNumber = "";
-
-        int num;
-        if (Int32.TryParse(partNumber, out num))
+        else if (currentline[j] == '.')
         {
-            Console.WriteLine(partNumber);
-            sum += num;
+            int num;
+            if ((isPartNumberValid) && (Int32.TryParse(partNumber, out num)))
+            {
+                // Console.WriteLine($"Part Number: {partNumber}");
+                sum += num;
+                isPartNumberValid = false;
+            }
             partNumber = "";
         }
-    }
-}
-
-
-
-string readAndConvertFileContentsToString(string fileName)
-{
-    string[] lines = File.ReadAllLines(fileName);
-
-    string content = "";
-    foreach (string line in lines)
-    {
-        content += line;
 
     }
-    return content;
+
 }
 
-static bool isSymbol(char ch)
+Console.WriteLine($"Sum: {sum}");
+
+bool isSymbol(char ch)
 {
-    string symbols = @"/@#!$%^&*()+-";
-    return symbols.Contains(ch) ? true : false;
+    string symbols = @"/@#!$%^&*()+-=";
+    return symbols.Contains(ch);
 }
