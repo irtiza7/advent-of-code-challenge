@@ -57,24 +57,35 @@ for (int i = 0; i < lines.Length; i++)
             {
                 if (isSymbol(diagonalCharacters[k]))
                 {
-                    Console.WriteLine($"Part Number: {partNumber} and Symbol at {k}: {diagonalCharacters[k]} \nPrevLine: {prevLine} \nNextLine: {nextLine}\n");
                     isPartNumberValid = true;
                     break;
                 }
             }
         }
-        else if (currentline[j] == '.')
+        else
         {
             int num;
             if ((isPartNumberValid) && (Int32.TryParse(partNumber, out num)))
             {
-                // Console.WriteLine($"Part Number: {partNumber}");
                 sum += num;
                 isPartNumberValid = false;
             }
             partNumber = "";
         }
 
+    }
+
+    /* 
+        Handle the case where the part number was at the end of line
+        Since the loop will end, the last number won't have been added to the sum 
+    */
+    if (partNumber.Length > 0 && isPartNumberValid)
+    {
+        int num;
+        if (Int32.TryParse(partNumber, out num))
+        {
+            sum += num;
+        }
     }
 
 }
