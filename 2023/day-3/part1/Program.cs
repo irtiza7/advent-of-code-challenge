@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-string inputFile = @"./input.txt";
+string inputFile = @"../input.txt";
 if (!File.Exists(inputFile))
 {
     Console.WriteLine($"Couldn't find file named: {inputFile.TrimStart("./".ToCharArray())}");
